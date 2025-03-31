@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import Home
-    from "./Home";
+import Home from "./Home";
 import {BaseUrl} from "../constants";
 import axios from "axios";
 
