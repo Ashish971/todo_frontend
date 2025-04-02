@@ -1,0 +1,46 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+const CreateTodo = ({ token }) => {
+  const [title, setTitle] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        'http://localhost:8000/api/todos/',
+        { title },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      navigate('/');
+    } catch (error) {
+      console.error('Creation failed:', error.response?.data);
+      alert('Failed to create todo!');
+    }
+  };
+
+  return (
+    <div className="create-todo">
+      <h2>Create New Todo</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter todo title"
+          required
+        />
+        <button type="submit">Create Todo</button>
+      </form>
+    </div>
+  );
+};
+
+export default CreateTodo;

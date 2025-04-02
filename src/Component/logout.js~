@@ -1,0 +1,49 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { BaseUrl } from "../constants";
+
+function Logout() {
+    const [Err, setErr] = useState("");
+
+    function logout() {
+        console.log("Logout function called!"); // Debugging: Check if this runs unexpectedly
+
+        const token = localStorage.getItem("Token"); // Get token directly here
+
+        if (!token) {
+            console.log("No token found. You are already logged out.");
+            setErr("No token found. You are already logged out.");
+            return;
+        }
+
+        let config = {
+            method: "post",
+            url: `${BaseUrl}/api/logout/`,
+            headers: {
+                Authorization: `Token ${token}`, // Use token directly
+            },
+        };
+
+        axios
+            .request(config)
+            .then((response) => {
+                console.log("Logout successful:", response.data);
+                localStorage.removeItem("Token"); // Remove token after logout
+                window.location.href = "/login"; // Redirect to login
+            })
+            .catch((error) => {
+                console.error("Logout error:", error);
+                setErr(error.response?.data || "Failed to logout.");
+            });
+    }
+
+    return (
+        <div>
+            <h1>Logout</h1>
+            <button onClick={logout}>Logout</button>
+            {Err && <p style={{ color: "red" }}>{Err}</p>}
+        </div>
+    );
+}
+
+export default Logout;
