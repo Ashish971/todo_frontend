@@ -1,64 +1,101 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import CreateTodo from './CreateTodo';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { BaseUrl2 } from "../constants";
+import TodoForm from "./TodoForm";
+import TodoItem from "./TodoItem";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [Err, setErr] = useState("")
-  const [showCreateTodo, setShowCreateTodo] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [Err, setErr] = useState("");
+  const [todoList, setTodoList] = useState([]);
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [_isMounted, setIsMounted] = useState(false);
 
-  const usernameChangeHandler = (event) => {
-    setUsername(event.target.value);
-  }
-
-  const passwordChangeHandler = (event) => {
-    setPassword(event.target.value);
-  }
-
-  const login = () => {
-    let data = JSON.stringify({
-      "username": username,
-      "password": password
-    });
-
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'http://localhost:8000/api/login/', // replace with your backend URL
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: data
+  useEffect(() => {
+    const token = localStorage.getItem("Token");
+    if (token && token !== "") {
+      setIsLoggedIn(true);
+    }
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
     };
+  }, []);
 
-    axios.request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-        localStorage.setItem("Token", response.data.token);
-        setErr("Login Successful!");
-        setShowCreateTodo(true);
-      })
-      .catch((error) => {
-        console.log(error);
-        setErr("No such User");
+  const login = async () => {
+    try {
+      const response = await axios.post(`${BaseUrl2}/api/login/`, {
+        username,
+        password,
       });
+      localStorage.setItem("Token", response.data.token);
+      setIsLoggedIn(true);
+    } catch (error) {
+      setErr(error.response?.data || "Login failed.");
+    }
+  };
+
+  const handleAddTodo = (todo) => {
+    if (_isMounted) {
+      setTodoList([...todoList, todo]);
+    }
+  };
+
+  const handleEditTodo = (todo) => {
+    setEditingTodo(todo);
+  };
+
+  const handleSaveEdit = (updatedTodo) => {
+    const updatedTodoList = todoList.map((todo) =>
+      todo.id === updatedTodo.id ? updatedTodo : todo
+    );
+    setTodoList(updatedTodoList);
+    setEditingTodo(null);
+  };
+
+  if (isLoggedIn) {
+    return (
+      <div>
+        <TodoForm onTodoAdded={handleAddTodo} />
+        <h2>Todo List:</h2>
+        <ul>
+          {todoList.map((todo, index) => (
+            <TodoItem
+              key={index}
+              todo={todo}
+              onEditTodo={handleEditTodo}
+            />
+          ))}
+        </ul>
+        {editingTodo && (
+          <TodoForm
+            todo={editingTodo}
+            onTodoUpdated={handleSaveEdit}
+          />
+        )}
+      </div>
+    );
   }
 
   return (
     <div>
       <h1>Login</h1>
-      <input type="text" placeholder="Username" onChange={usernameChangeHandler}/>
-      <input type="password" placeholder="Password" onChange={passwordChangeHandler}/>
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <button onClick={login}>Login</button>
-      {Err === "Login Successful!" ? (
-        <div>
-          <p style={{ color: "green" }}>{Err}</p>
-          {showCreateTodo && <CreateTodo />}
-        </div>
-      ) : (
-        <p style={{ color: "red" }}>{Err}</p>
-      )}
+      <p>{Err}</p>
     </div>
   );
 }
