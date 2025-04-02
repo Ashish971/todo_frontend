@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {BaseUrl} from "../constants";
+import {BaseUrl2} from "../constants";
 
 function TodoList() {
   const [todos, setTodos] = useState([]);
@@ -10,7 +10,7 @@ function TodoList() {
     const fetchTodos = async () => {
       try {
         const token = localStorage.getItem("Token");
-        const response = await axios.get(`${BaseUrl}/api/todos/`, {
+        const response = await axios.get(`${BaseUrl2}/api/todos/`, {
           headers: {
             Authorization: `Token ${token}`
           }

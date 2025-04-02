@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import Home from "./Home";
-import {BaseUrl} from "../constants";
+import Navbar from "./Navbar";
+import {BaseUrl2} from "../constants";
 import axios from "axios";
 
 function Register(props) {
@@ -34,7 +34,7 @@ function Register(props) {
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: BaseUrl+'/api/register/',
+                url: BaseUrl2 +'/api/register/',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -55,7 +55,7 @@ function Register(props) {
 
     return (
         <div>
-            <Home/>
+            {/*<Navbar/>*/}
             <h1>Register</h1>
             <p>Username: <input type="text" onChange={usernameChangeHandler} /></p>
             <p>Email: <input type="email" onChange={emailChangeHandler} /></p>
