@@ -15,7 +15,6 @@ function Home(props) {
                     <Link to="/login">Login</Link>
                 </li>
 
-
             </ul>
 
         </div>
